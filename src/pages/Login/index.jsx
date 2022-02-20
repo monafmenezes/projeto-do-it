@@ -1,6 +1,6 @@
 import { Background, Container, Content, AnimationContainer } from "./styles"
 import Button from '../../components/Button'
-import { Link } from "react-router-dom"
+import { Link, Redirect } from "react-router-dom"
 import Input from "../../components/Input"
 import { FiMail, FiLock} from 'react-icons/fi'
 import { useForm } from "react-hook-form"
@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import { useHistory } from "react-router-dom"
 
 
-const Login = () => {
+const Login = ({authenticated ,setAuthenticated}) => {
     const schema = yup.object().shape({
         email: yup.string().email('Email inválido').required('Campo obrigatório'),
         password: yup.string().min(8, 'mínimo 8 digitos').required('Campo obrigatório'),
@@ -20,24 +20,25 @@ const Login = () => {
     const {register, handleSubmit, formState: {errors}} = useForm({
         resolver: yupResolver(schema)
     })
-    
-    const history = useHistory()
 
-    const submit = ({ email, password}) => {
-       const user = {email, password }
-       api.post("/user/login", user)
+    const history = useHistory()
+    const submit = (data) => {
+       api.post("/user/login", data)
        .then((response) => {
-        toast.success('Sucesso ao realizar login')
-            history.push('/dashbord')
+            const {token} = response.data
+            localStorage.setItem('@Doit:token', JSON.stringify(token))
+            setAuthenticated(true)
+            return history.push('/dashboard')
 
        })
        .catch((_) => {
-        toast.error('Conta inválida, faça seu cadastro')
-
+        toast.error('Email ou senha inválidos')
        })
-
     } 
 
+    if(authenticated) {
+        return <Redirect to='/dashboard' />
+    }
 
     return(
         <Container>

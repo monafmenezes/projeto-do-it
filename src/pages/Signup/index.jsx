@@ -1,6 +1,6 @@
 import { Background, Container, Content, AnimationContainer } from "./styles"
 import Button from '../../components/Button'
-import { Link } from "react-router-dom"
+import { Link, Redirect } from "react-router-dom"
 import Input from "../../components/Input"
 import {FiUser, FiMail, FiLock} from 'react-icons/fi'
 import { useForm } from "react-hook-form"
@@ -12,7 +12,7 @@ import { useHistory } from "react-router-dom"
 
 
 
-const Signup = () => {
+const Signup = ({authenticated}) => {
 
     const schema = yup.object().shape({
         name: yup.string().required('Campo obrigatório'),
@@ -41,6 +41,10 @@ const Signup = () => {
        })
 
     } 
+
+    if(authenticated) {
+        return <Redirect to='/dashboard' />
+    }
 
 
     return(
